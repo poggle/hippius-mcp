@@ -25,6 +25,32 @@ Early OSS release. The current server is intentionally small and local-first. It
 
 Create credentials in the Hippius console under S3 Storage. The access key usually starts with `hip_`.
 
+## Install
+
+After the package is published to npm, MCP clients can run it with `npx`:
+
+```bash
+npx -y hippius-mcp
+```
+
+The server reads configuration from environment variables. For `npx` installs, configure those variables in your MCP client or shell:
+
+```env
+HIPPIUS_BUCKET_NAME=your-unique-bucket-name
+HIPPIUS_ACCESS_KEY=hip_your_key
+HIPPIUS_SECRET_KEY=your_secret
+```
+
+Optional:
+
+```env
+HIPPIUS_ENDPOINT=https://s3.hippius.com
+HIPPIUS_REGION=decentralized
+HIPPIUS_PREFIX=mcp/
+```
+
+Use your own bucket name. `your-unique-bucket-name` is only a placeholder.
+
 ## Install From Source
 
 ```bash
@@ -57,9 +83,80 @@ HIPPIUS_PREFIX=mcp/
 
 ## MCP Client Setup
 
+The recommended setup uses `npx` so users do not need to clone or build this repository.
+
+### Codex With npx
+
+If your Hippius env vars are available in the shell that starts Codex, add the server and allow Codex to forward them:
+
+```toml
+[mcp_servers.hippius]
+command = "npx"
+args = ["-y", "hippius-mcp"]
+env_vars = ["HIPPIUS_BUCKET_NAME", "HIPPIUS_ACCESS_KEY", "HIPPIUS_SECRET_KEY"]
+```
+
+You can add that block to `~/.codex/config.toml`.
+
+Alternatively, add it with explicit env values:
+
+```bash
+codex mcp add hippius \
+  --env HIPPIUS_BUCKET_NAME=your-unique-bucket-name \
+  --env HIPPIUS_ACCESS_KEY=hip_your_key \
+  --env HIPPIUS_SECRET_KEY=your_secret \
+  -- npx -y hippius-mcp
+```
+
+Verify:
+
+```bash
+codex mcp get hippius
+codex mcp list
+```
+
+In a Codex session, run `/mcp` to check that the server is active. You may need to start a new Codex session before newly added tools appear.
+
+### Claude Code With npx
+
+```bash
+claude mcp add --scope user hippius \
+  -e HIPPIUS_BUCKET_NAME=your-unique-bucket-name \
+  -e HIPPIUS_ACCESS_KEY=hip_your_key \
+  -e HIPPIUS_SECRET_KEY=your_secret \
+  -- npx -y hippius-mcp
+```
+
+Verify:
+
+```bash
+claude mcp get hippius
+claude mcp list
+```
+
+### Generic MCP JSON With npx
+
+```json
+{
+  "mcpServers": {
+    "hippius": {
+      "command": "npx",
+      "args": ["-y", "hippius-mcp"],
+      "env": {
+        "HIPPIUS_BUCKET_NAME": "your-unique-bucket-name",
+        "HIPPIUS_ACCESS_KEY": "hip_...",
+        "HIPPIUS_SECRET_KEY": "..."
+      }
+    }
+  }
+}
+```
+
+## Source Checkout MCP Setup
+
 Use an absolute path to `dist/index.js`. If you keep credentials in this project's `.env`, launch the server from this directory.
 
-### Codex
+### Codex From Source
 
 ```bash
 codex mcp add hippius -- /bin/zsh -lc 'cd /absolute/path/to/hippius-mcp && exec node dist/index.js'
@@ -74,7 +171,7 @@ codex mcp list
 
 In a Codex session, run `/mcp` to check that the server is active. You may need to start a new Codex session before newly added tools appear.
 
-### Claude Code
+### Claude Code From Source
 
 ```bash
 claude mcp add --scope user hippius -- /bin/zsh -lc 'cd /absolute/path/to/hippius-mcp && exec node dist/index.js'
@@ -87,9 +184,9 @@ claude mcp get hippius
 claude mcp list
 ```
 
-### Generic MCP JSON
+### Generic MCP JSON From Source
 
-If your MCP client accepts JSON config, either pass env vars directly:
+If your MCP client accepts JSON config, pass env vars directly:
 
 ```json
 {
