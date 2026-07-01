@@ -20,7 +20,7 @@ Early OSS release. The current server is intentionally small and local-first. It
 
 - Node.js 20 or newer
 - A Hippius account
-- A Hippius S3 bucket
+- A Hippius S3 bucket with a name unique to your account/use case
 - Hippius S3 credentials from the Hippius console
 
 Create credentials in the Hippius console under S3 Storage. The access key usually starts with `hip_`.
@@ -38,10 +38,12 @@ cp .env.example .env
 Edit `.env`:
 
 ```env
-HIPPIUS_BUCKET_NAME=agent
+HIPPIUS_BUCKET_NAME=your-unique-bucket-name
 HIPPIUS_ACCESS_KEY=hip_your_key
 HIPPIUS_SECRET_KEY=your_secret
 ```
+
+Use your own bucket name. `your-unique-bucket-name` is only a placeholder.
 
 Optional:
 
@@ -96,7 +98,7 @@ If your MCP client accepts JSON config, either pass env vars directly:
       "command": "node",
       "args": ["/absolute/path/to/hippius-mcp/dist/index.js"],
       "env": {
-        "HIPPIUS_BUCKET_NAME": "agent",
+        "HIPPIUS_BUCKET_NAME": "your-unique-bucket-name",
         "HIPPIUS_ACCESS_KEY": "hip_...",
         "HIPPIUS_SECRET_KEY": "..."
       }
